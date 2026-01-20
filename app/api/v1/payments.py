@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, Query, status
 from sqlalchemy.orm import Session
 
 from app.core.db import get_db
@@ -21,8 +21,8 @@ def create_payment_endpoint(
 
 @router.get("", response_model=PaginatedResponse[PaymentRead])
 def list_payments_endpoint(
-    limit: int = 10,
-    offset: int = 0,
+    limit: int = Query(default=10, ge=1, le=100),
+    offset: int = Query(default=0, ge=0),
     invoice_id: int | None = None,
     student_id: int | None = None,
     school_id: int | None = None,

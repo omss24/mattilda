@@ -10,6 +10,14 @@ from app.schemas.statement import SchoolStatement, StatementInvoiceItem, Student
 
 
 def get_school_statement(db: Session, school_id: int) -> SchoolStatement | None:
+    """Generate an account statement for a school.
+    
+    Returns aggregated financial data including:
+    - Total invoiced amount (excluding cancelled)
+    - Total payments received
+    - Outstanding balance
+    - Breakdown by invoice with per-invoice balances
+    """
     school = db.get(School, school_id)
     if not school:
         return None

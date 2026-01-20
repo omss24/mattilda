@@ -1,3 +1,9 @@
+"""Redis-based caching for expensive operations.
+
+Used primarily for caching account statements which require
+aggregation across multiple tables. Cache is invalidated
+when invoices or payments are created/updated.
+"""
 import json
 from typing import Any
 

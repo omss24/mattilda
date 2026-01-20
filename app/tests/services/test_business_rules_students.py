@@ -1,6 +1,7 @@
 import pytest
 from sqlalchemy.exc import IntegrityError
 
+from app.core.exceptions import EntityNotFoundError, ValidationError
 from app.models.school import School
 from app.models.student import StudentStatus
 from app.schemas.school import SchoolCreate
@@ -16,12 +17,12 @@ def test_student_requires_existing_school(db_session):
         last_name="Lopez",
         status=StudentStatus.active,
     )
-    with pytest.raises(ValueError, match="School does not exist"):
+    with pytest.raises(EntityNotFoundError, match="School"):
         create_student(db_session, student_in)
 
 
 def test_student_status_must_be_valid():
-    with pytest.raises(ValueError, match="Invalid student status"):
+    with pytest.raises(ValidationError, match="Invalid student status"):
         ensure_valid_student_status("invalid")
 
 

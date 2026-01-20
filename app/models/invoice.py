@@ -18,6 +18,11 @@ if TYPE_CHECKING:
 
 
 class InvoiceStatus(str, Enum):
+    """Invoice lifecycle states.
+    
+    Transitions: pending → partially_paid → paid (terminal)
+                 Any state → cancelled (terminal)
+    """
     pending = "pending"
     partially_paid = "partially_paid"
     paid = "paid"

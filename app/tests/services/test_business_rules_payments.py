@@ -1,5 +1,6 @@
 import pytest
 
+from app.core.exceptions import BusinessRuleError, EntityNotFoundError, ValidationError
 from app.models.invoice import InvoiceStatus
 from app.schemas.invoice import InvoiceCreate
 from app.schemas.payment import PaymentCreate
@@ -43,7 +44,7 @@ def test_payment_requires_existing_invoice(db_session):
         amount="10.00",
         method="transfer",
     )
-    with pytest.raises(ValueError, match="Invoice does not exist"):
+    with pytest.raises(EntityNotFoundError, match="Invoice"):
         create_payment(db_session, payment_in)
 
 
@@ -55,7 +56,7 @@ def test_payment_amount_must_be_positive(db_session):
         amount="0",
         method="transfer",
     )
-    with pytest.raises(ValueError, match="amount must be greater than zero"):
+    with pytest.raises(ValidationError, match="amount must be greater than zero"):
         create_payment(db_session, payment_in)
 
 
@@ -68,7 +69,7 @@ def test_payment_cannot_target_cancelled_invoice(db_session):
         amount="10.00",
         method="transfer",
     )
-    with pytest.raises(ValueError, match="cancelled invoice"):
+    with pytest.raises(BusinessRuleError, match="cancelled invoice"):
         create_payment(db_session, payment_in)
 
 
@@ -83,7 +84,7 @@ def test_payment_total_cannot_exceed_invoice_amount(db_session):
             method="transfer",
         ),
     )
-    with pytest.raises(ValueError, match="cannot exceed"):
+    with pytest.raises(BusinessRuleError, match="cannot exceed"):
         create_payment(
             db_session,
             PaymentCreate(

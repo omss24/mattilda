@@ -1,5 +1,6 @@
 import pytest
 
+from app.core.exceptions import EntityNotFoundError, ValidationError
 from app.models.invoice import InvoiceStatus
 from app.schemas.invoice import InvoiceCreate
 from app.schemas.school import SchoolCreate
@@ -33,7 +34,7 @@ def test_invoice_requires_existing_student(db_session):
         currency="MXN",
         status=InvoiceStatus.pending,
     )
-    with pytest.raises(ValueError, match="Student does not exist"):
+    with pytest.raises(EntityNotFoundError, match="Student"):
         create_invoice(db_session, invoice_in)
 
 
@@ -49,7 +50,7 @@ def test_invoice_school_id_must_match_student(db_session):
         currency="MXN",
         status=InvoiceStatus.pending,
     )
-    with pytest.raises(ValueError, match="school_id must match"):
+    with pytest.raises(ValidationError, match="school_id must match"):
         create_invoice(db_session, invoice_in)
 
 
@@ -64,7 +65,7 @@ def test_invoice_amount_must_be_positive(db_session):
         currency="MXN",
         status=InvoiceStatus.pending,
     )
-    with pytest.raises(ValueError, match="amount must be greater than zero"):
+    with pytest.raises(ValidationError, match="amount must be greater than zero"):
         create_invoice(db_session, invoice_in)
 
 
@@ -79,5 +80,5 @@ def test_invoice_due_date_must_be_after_issue_date(db_session):
         currency="MXN",
         status=InvoiceStatus.pending,
     )
-    with pytest.raises(ValueError, match="due_date"):
+    with pytest.raises(ValidationError, match="due_date"):
         create_invoice(db_session, invoice_in)

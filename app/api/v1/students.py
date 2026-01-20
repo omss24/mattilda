@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, HTTPException, Request, status
+from fastapi import APIRouter, Depends, HTTPException, Query, Request, status
 from sqlalchemy.orm import Session
 
 from app.core.cache import build_cache_key, cache_get, cache_set
@@ -30,8 +30,8 @@ def create_student_endpoint(
 
 @router.get("", response_model=PaginatedResponse[StudentRead])
 def list_students_endpoint(
-    limit: int = 10,
-    offset: int = 0,
+    limit: int = Query(default=10, ge=1, le=100),
+    offset: int = Query(default=0, ge=0),
     school_id: int | None = None,
     db: Session = Depends(get_db),
 ) -> PaginatedResponse[StudentRead]:

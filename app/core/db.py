@@ -1,3 +1,4 @@
+"""Database session and connection management."""
 from sqlalchemy import create_engine
 from typing import Generator
 
@@ -13,6 +14,10 @@ Base = declarative_base()
 
 
 def get_db() -> Generator[Session, None, None]:
+	"""FastAPI dependency that provides a database session.
+	
+	Yields a session and ensures it's closed after the request.
+	"""
 	db = SessionLocal()
 	try:
 		yield db

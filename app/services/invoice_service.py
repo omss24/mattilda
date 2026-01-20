@@ -1,9 +1,16 @@
+"""Invoice management service.
+
+Handles creation, updates, and cancellation of invoices.
+Invoices are financial records linking a student to a school
+with an amount due by a specific date.
+"""
 from datetime import date
 
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 
 from app.core.cache import cache_invalidate_prefix
+from app.core.exceptions import EntityNotFoundError, ValidationError
 from app.models.invoice import Invoice, InvoiceStatus
 from app.models.student import Student
 from app.schemas.invoice import InvoiceCreate, InvoiceUpdate
@@ -23,15 +30,22 @@ def _validate_invoice_input(
 	due_date: date,
 	amount: float,
 ) -> None:
+	"""Validate invoice data before creation or update.
+	
+	Business Rules:
+	- Student must exist and belong to the specified school
+	- Amount must be positive
+	- Due date must be on or after issue date
+	"""
 	student = db.get(Student, student_id)
 	if not student:
-		raise ValueError("Student does not exist")
+		raise EntityNotFoundError("Student", student_id)
 	if student.school_id != school_id:
-		raise ValueError("Invoice school_id must match student's school_id")
+		raise ValidationError("Invoice school_id must match student's school_id")
 	if amount <= 0:
-		raise ValueError("Invoice amount must be greater than zero")
+		raise ValidationError("Invoice amount must be greater than zero")
 	if due_date < issue_date:
-		raise ValueError("Invoice due_date must be on or after issue_date")
+		raise ValidationError("Invoice due_date must be on or after issue_date")
 
 
 def list_invoices(
@@ -112,6 +126,11 @@ def update_invoice(db: Session, invoice_id: int, invoice_in: InvoiceUpdate) -> I
 
 
 def cancel_invoice(db: Session, invoice_id: int) -> Invoice | None:
+	"""Cancel an invoice.
+	
+	Note: In production, should validate that no payments exist
+	or require refunding payments before cancellation.
+	"""
 	invoice = db.get(Invoice, invoice_id)
 	if not invoice:
 		return None

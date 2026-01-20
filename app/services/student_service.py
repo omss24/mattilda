@@ -1,6 +1,8 @@
+"""Student management service."""
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 
+from app.core.exceptions import EntityNotFoundError, ValidationError
 from app.models.school import School
 from app.models.student import Student
 from app.models.student import StudentStatus
@@ -14,7 +16,7 @@ def ensure_valid_student_status(status: str | StudentStatus) -> StudentStatus:
     try:
         return StudentStatus(status)
     except ValueError as exc:
-        raise ValueError("Invalid student status") from exc
+        raise ValidationError("Invalid student status") from exc
 
 
 def get_student(db: Session, student_id: int) -> Student | None:
@@ -33,9 +35,15 @@ def list_students(
 
 
 def create_student(db: Session, student_in: StudentCreate) -> Student:
+    """Create a new student.
+    
+    Business Rules:
+    - School must exist
+    - Status must be a valid StudentStatus enum value
+    """
     school = db.get(School, student_in.school_id)
     if not school:
-        raise ValueError("School does not exist")
+        raise EntityNotFoundError("School", student_in.school_id)
 
     status = ensure_valid_student_status(student_in.status)
     student_data = student_in.model_dump()

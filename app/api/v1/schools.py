@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, HTTPException, Request, status
+from fastapi import APIRouter, Depends, HTTPException, Query, Request, status
 from sqlalchemy.orm import Session
 
 from app.core.cache import build_cache_key, cache_get, cache_set
@@ -30,7 +30,9 @@ def create_school_endpoint(
 
 @router.get("", response_model=PaginatedResponse[SchoolRead])
 def list_schools_endpoint(
-    limit: int = 10, offset: int = 0, db: Session = Depends(get_db)
+    limit: int = Query(default=10, ge=1, le=100),
+    offset: int = Query(default=0, ge=0),
+    db: Session = Depends(get_db),
 ) -> PaginatedResponse[SchoolRead]:
     result = list_schools(db, limit=limit, offset=offset)
     return PaginatedResponse(**result)
