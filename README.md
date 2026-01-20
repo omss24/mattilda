@@ -22,3 +22,17 @@ Using Poetry locally:
 poetry install
 poetry run pytest
 ```
+
+Using Docker via Makefile:
+
+```bash
+make docker-test
+```
+
+## Wishlist (time constraints)
+
+Stuff I would have added with more time:
+
+- Async support from the start
+- OpenAPI support (expanded docs/spec)
+- Separate repos for FE and BE
