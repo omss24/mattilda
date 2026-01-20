@@ -1,0 +1,29 @@
+version: "3.9"
+
+services:
+  db:
+    image: postgres:15
+    environment:
+      POSTGRES_DB: mattilda_db
+      POSTGRES_USER: mattilda_user
+      POSTGRES_PASSWORD: mattilda_password
+    volumes:
+      - db_data:/var/lib/postgresql/data
+
+  api:
+    build: .
+    depends_on:
+      - db
+      - redis
+    environment:
+      DATABASE_URL: postgresql+psycopg2://mattilda_user:mattilda_password@db:5432/mattilda_db
+      API_KEY: dev-api-key
+      REDIS_URL: redis://redis:6379/0
+    ports:
+      - "8000:8000"
+
+  redis:
+    image: redis:7
+
+volumes:
+  db_data:

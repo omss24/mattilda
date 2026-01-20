@@ -1,0 +1,41 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.so
+*.egg-info/
+.venv/
+venv/
+.env
+.env.*
+
+# Poetry
+poetry.lock
+
+# Pytest
+.pytest_cache/
+
+# Mypy/ruff/coverage
+.mypy_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+
+# VS Code
+.vscode/
+
+# OS files
+.DS_Store
+
+# Docker
+*.log
+
+# Alembic
+alembic/versions/__pycache__/
+
+# Redis
+redis-data/
+
+# Node (if any tooling appears)
+node_modules/
